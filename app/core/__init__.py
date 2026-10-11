@@ -1,0 +1,1 @@
+# Spectre OSINT Core Module

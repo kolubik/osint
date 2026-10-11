@@ -1,0 +1,6 @@
+{
+  "name": "Spectre OSINT / GEOINT Suite",
+  "description": "Autonomous Open Source Intelligence, Geolocation, and Infrastructure Analysis Dashboard with interactive entity graph visualization, EXIF GPS extractor, and multi-platform reconnaissance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

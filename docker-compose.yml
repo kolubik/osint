@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  spectre-osint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spectre_osint_engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
