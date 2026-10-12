@@ -721,9 +721,31 @@ export default function App() {
           </motion.div>
         )}
 
-        {activeTab === 'telegram' && currentReport?.telegram_activity && (
+        {activeTab === 'telegram' && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-            <TelegramActivityView activity={currentReport.telegram_activity} onPivotToGraph={() => setActiveTab('graph')} />
+            {currentReport?.telegram_activity ? (
+              <TelegramActivityView activity={currentReport.telegram_activity} onPivotToGraph={() => setActiveTab('graph')} />
+            ) : (
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center max-w-xl mx-auto space-y-4 my-8">
+                <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                  ✈️
+                </div>
+                <h3 className="text-lg font-bold text-white">Модуль анализа публичной экосистемы Telegram</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Глубокий анализ цифрового следа: обнаружение открытых чатов, каналов, сообщений и медиафайлов. Автопроверка доступности с красной маркировкой невалидных/заблокированных чатов и показом резервных копий устаревших данных.
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      executeUsernameScan('durov');
+                    }}
+                    className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold rounded-lg shadow-md transition-all cursor-pointer"
+                  >
+                    Запустить демо-анализ для @durov
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 

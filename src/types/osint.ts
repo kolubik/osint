@@ -196,6 +196,36 @@ export interface GoogleDork {
   google_search_url: string;
 }
 
+export interface TelegramChatBackup {
+  has_cached_backup: boolean;
+  archive_source: string;
+  archived_date: string;
+  cached_title: string;
+  cached_description: string;
+  cached_members_count: number;
+  cached_messages_sample: string[];
+  archive_url: string;
+  last_active_timestamp?: string;
+  cached_topics?: string[];
+}
+
+export interface TelegramMessageBackup {
+  has_cached_backup: boolean;
+  archive_source: string;
+  archived_date: string;
+  cached_text: string;
+  archive_url?: string;
+}
+
+export interface TelegramProfileBackup {
+  has_cached_backup: boolean;
+  archive_source: string;
+  archived_date: string;
+  cached_bio?: string;
+  cached_display_name?: string;
+  archive_url?: string;
+}
+
 export interface TelegramChat {
   chat_id: string;
   title: string;
@@ -209,6 +239,7 @@ export interface TelegramChat {
   can_view_history: boolean;
   preview_web_url?: string;
   last_checked_at?: string;
+  backup_data?: TelegramChatBackup;
 }
 
 export interface TelegramMediaItem {
@@ -244,6 +275,8 @@ export interface TelegramMessage {
   matched_keywords?: string[];
   is_verified_accessible?: boolean;
   access_check?: 'ACCESSIBLE' | 'RESTRICTED_CHAT' | 'NOT_FOUND';
+  access_details?: string;
+  backup_data?: TelegramMessageBackup;
 }
 
 export interface TelegramActivityReport {
@@ -253,6 +286,9 @@ export interface TelegramActivityReport {
   profile_status?: 'ACTIVE_PROFILE' | 'NOT_FOUND' | 'RESTRICTED';
   profile_bio?: string;
   profile_avatar_url?: string;
+  profile_is_valid?: boolean;
+  profile_check_details?: string;
+  profile_backup?: TelegramProfileBackup;
   is_telethon_authenticated: boolean;
   total_chats_found: number;
   total_messages_found: number;

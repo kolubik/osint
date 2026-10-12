@@ -973,18 +973,27 @@ def export_obsidian_canvas(report: ScanReport) -> str:
             tg_chat_positions[chat_id_val] = c_id
 
             check_status = chat.get('join_check_status', 'VALID_OPEN')
-            status_tag = "🟢 ВАЛИДЕН: МОЖНО ВОЙТИ И СМОТРЕТЬ" if check_status == "VALID_OPEN" else "🟡 ЗАКРЫТ: ТОЛЬКО ПО ИНВАЙТУ" if check_status == "RESTRICTED" else "🔴 НЕДОСТУПЕН / БАН"
+            status_tag = "🟢 ВАЛИДЕН: МОЖНО ВОЙТИ И СМОТРЕТЬ" if check_status == "VALID_OPEN" else "🟡 ЗАКРЫТ: ТОЛЬКО ПО ИНВАЙТУ" if check_status == "RESTRICTED" else "🔴 НЕВАЛИДЕН: НЕДОСТУПЕН / БАН"
             color_code = "4" if check_status == "VALID_OPEN" else "3" if check_status == "RESTRICTED" else "1"
             access_evidence = chat.get('access_details', 'Открытый доступ')
+
+            backup_str = ""
+            b = chat.get('backup_data')
+            if b:
+                b_src = b.get('archive_source', 'Web Archive')
+                b_date = b.get('archived_date', '')
+                b_desc = b.get('cached_description', '')
+                b_url = b.get('archive_url', '')
+                backup_str = f"\n\n📦 **БЭКАП УСТАРЕВШИХ ДАННЫХ (ОТКРЫТЫЙ КЭШ):**\n- **Источник:** {b_src}\n- **Снимок:** `{b_date}`\n- **Описание из кэша:** {b_desc[:80]}...\n[Зеркало веб-архива]({b_url})"
 
             nodes.append({
                 "id": c_id,
                 "type": "text",
-                "text": f"#### 💬 [[{chat.get('title', 'Public Chat')}]]\n**Статус:** `{status_tag}`\n- **Вход и просмотр:** {'✅ Разрешен' if chat.get('can_view_history', True) else '🔒 Ограничен'}\n- **ID:** `{chat_id_val}`\n- **Handle:** `@{chat.get('username') or 'private'}`\n- **Участников:** {chat.get('members_count') or 'N/A'}\n- **Аудит доступа:** {access_evidence}\n\n[Chat Deep Link]({chat.get('invite_or_link')})",
+                "text": f"#### 💬 [[{chat.get('title', 'Public Chat')}]]\n**Статус:** `{status_tag}`\n- **Вход и просмотр:** {'✅ Разрешен' if chat.get('can_view_history', True) else '🔒 Ограничен'}\n- **ID:** `{chat_id_val}`\n- **Handle:** `@{chat.get('username') or 'private'}`\n- **Участников:** {chat.get('members_count') or 'N/A'}\n- **Аудит доступа:** {access_evidence}\n\n[Chat Deep Link]({chat.get('invite_or_link')}){backup_str}",
                 "x": cx,
                 "y": cy,
-                "width": 340,
-                "height": 220,
+                "width": 350,
+                "height": 260 if b else 220,
                 "color": color_code
             })
             edges.append({

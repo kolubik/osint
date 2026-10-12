@@ -473,15 +473,30 @@ export function generateObsidianCanvas(report: ScanReport): string {
       const cy = -880 - row * 240;
       tgChatPositions[chat.chat_id] = cId;
 
+      const isInvalid = chat.join_check_status === 'INVALID_OR_BANNED';
+      const isRestricted = chat.join_check_status === 'RESTRICTED';
+      const colorCode = isInvalid ? '1' : isRestricted ? '3' : '4';
+      const statusTag = isInvalid
+        ? '🔴 НЕВАЛИДЕН: НЕДОСТУПЕН / БАН'
+        : isRestricted
+        ? '🟡 ЗАКРЫТ: ТОЛЬКО ПО ИНВАЙТУ'
+        : '🟢 ВАЛИДЕН: МОЖНО ВОЙТИ И СМОТРЕТЬ';
+
+      let backupStr = '';
+      if (chat.backup_data) {
+        const b = chat.backup_data;
+        backupStr = `\n\n📦 **БЭКАП УСТАРЕВШИХ ДАННЫХ (ОТКРЫТЫЙ КЭШ):**\n- **Источник:** ${b.archive_source}\n- **Снимок:** \`${b.archived_date}\`\n- **Описание из кэша:** ${b.cached_description.slice(0, 80)}...\n[Зеркало веб-архива](${b.archive_url})`;
+      }
+
       nodes.push({
         id: cId,
         type: 'text',
-        text: `#### 💬 [[${chat.title}]]\n**ID:** \`${chat.chat_id}\`\n**Handle:** \`@${chat.username || 'private'}\`\n**Members:** ${chat.members_count || 'N/A'}\n[Chat Deep Link](${chat.invite_or_link})`,
+        text: `#### 💬 [[${chat.title}]]\n**Статус:** \`${statusTag}\`\n- **Вход и просмотр:** ${chat.can_view_history ? '✅ Разрешен' : '🔒 Ограничен'}\n- **ID:** \`${chat.chat_id}\`\n- **Handle:** \`@${chat.username || 'private'}\`\n- **Members:** ${chat.members_count || 'N/A'}\n- **Аудит доступа:** ${chat.access_details}\n\n[Chat Deep Link](${chat.invite_or_link})${backupStr}`,
         x: cx,
         y: cy,
-        width: 320,
-        height: 180,
-        color: '2' // Blue
+        width: 350,
+        height: isInvalid ? 280 : 210,
+        color: colorCode
       });
 
       edges.push({
@@ -499,16 +514,24 @@ export function generateObsidianCanvas(report: ScanReport): string {
       const mx = -500 + (mIdx % 4) * 340;
       const my = -1400 - Math.floor(mIdx / 4) * 280;
       const mediaTag = msg.has_media ? `📎 [${(msg.media_type || 'file').toUpperCase()}]` : '💬 [TEXT]';
+      const isInvalidMsg = msg.access_check === 'NOT_FOUND' || !msg.is_verified_accessible;
+      const msgColor = isInvalidMsg ? '1' : '4';
+      const msgStatus = isInvalidMsg ? '🔴 [АРХИВНЫЙ БЭКАП - ЧАТ ЗАБЛОКИРОВАН]' : '🟢 [ДОСТУПНО ОНЛАЙН]';
+
+      let msgBackup = '';
+      if (msg.backup_data) {
+        msgBackup = `\n\n📦 **Бэкап:** ${msg.backup_data.archive_source} (${msg.backup_data.archived_date})`;
+      }
 
       nodes.push({
         id: msgId,
         type: 'text',
-        text: `#### 📝 Msg #${msg.message_id} (${mediaTag})\n**Chat:** ${msg.chat_title}\n**Date:** \`${msg.date}\`\n\n> ${msg.text.slice(0, 100)}\n\n[Message Link](${msg.message_url})`,
+        text: `#### ${msgStatus} Msg #${msg.message_id} (${mediaTag})\n**Chat:** ${msg.chat_title}\n**Date:** \`${msg.date}\`\n**Доступ:** ${msg.access_details || 'Проверено'}\n\n> ${msg.text.slice(0, 100)}\n\n[Message Link](${msg.message_url})${msgBackup}`,
         x: mx,
         y: my,
-        width: 310,
-        height: 200,
-        color: '4' // Purple
+        width: 330,
+        height: isInvalidMsg ? 250 : 210,
+        color: msgColor
       });
 
       // 1. Profile -> Message
